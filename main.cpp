@@ -12,6 +12,8 @@ struct Mem {
 		Byte mem[ 1024 * 64 ]; 	//65.536bytes
 	};
 
+// 6502 CPU 
+// Require memory
 struct Cpu {
 
 		//CPU Registers
@@ -29,17 +31,24 @@ struct Cpu {
 		Byte V : 1;	//6: Overflow
 		Byte N : 1;	//7: Negative
 
+		//CPU state, this is usefull for cycle accuracy
+		Byte State; //0 fetch, 1 execute, 2 store
+					//during 2
+
 	void Reset(Mem& mem){
 
 		for (int i=0; i <= 1024;i++){
 		mem.mem[i] = 0x00;
-		}
-	PC = 0xFFFC;	//and FFFD?!
-	SP = 0x0100;	//Not accurate?
+			}
+		PC = 0xFFFC;	//and FFFD?!
+		SP = 0x0100;	//Not accurate?
 
 	}
 };
-
+//cpu for the cpu in use
+void CPUrun(Cpu cpu, Mem mem, Byte step){
+	return;
+}
 //cpu for the cpu in use
 //loc should be a hexvalue of the memory location to be seen
 //status boolean if you want the registers to be printed or not
@@ -50,7 +59,7 @@ void PrintStats(Cpu cpu, Mem mem, int loc, bool status){
 	int hcounter = 0;	//horizontal counter
 	for (int i=loc; i <=loc+129;i++){
 		//show adress per line
-		if(hcounter ==0)printf("%#06X ", i);
+		if(hcounter ==0)printf("0x%05X ", i);
 
 		printf("%02X ", mem.mem[i]);
 		hcounter++;
@@ -110,18 +119,21 @@ int main(){
 	while(1){
 		char str;
 		printf("Commands: C for continue, Q to quit, S 0x??? for show memory\n");
-		scanf("%c", &str);
+		scanf(" %c", &str);
 		switch (str) {
-       		case '\n':
-		       	//no command
-		       	break;
-	        case 'C':
+            case 'C':
 	        case 'c':
-	            	PrintStats(cpu, mem, cpu.PC, true);
-			printf("Cycle: %d \n", Cycles);
-			Cycles++;
-			//do cpu step
-	            	break;
+	 	    		Cycles++;
+					//do cpu step
+					CPUrun(cpu, mem, 1);
+				   	PrintStats(cpu, mem, cpu.PC, true);
+					printf("Cycle: %d \n", Cycles);
+			    	break;
+	        case 'S':
+	        case 's':
+	            	PrintStats(cpu, mem, 0x00, true);
+					printf("Cycle: %d \n", Cycles);
+		       	break;
 	        case 'Q':
 	        case 'q':
 			Cycles = CycleAmount;
@@ -130,10 +142,10 @@ int main(){
 	            	break;
 		}
 
-		if(Cycles == CycleAmount){
+		if(Cycles >= CycleAmount){
 			break;
 		}
-		str =0x00; //strip away extra chars
+		str =0x0000; //strip away extra chars
 	}
 
 

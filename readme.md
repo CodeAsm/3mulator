@@ -1,4 +1,4 @@
-# 6502 Emu  and d3com
+# 8bit Emu and d3com
 
 My personal small emulation and decompilation project for smaller 8bit like cpu systems.
 It probably wont work, doesnt provide what you where looking for and programmed the way you like.
@@ -20,6 +20,7 @@ S to show a certain portion of memory (not implemented yet)
 ## Ideas
 
 Some basic ideas I have that I might be able to achieve:
+
 * Add more cpu types like a z80, 8052 and maybe 8086
 * load roms
 * GPU's for various cpu (simple first hehe)
@@ -31,6 +32,8 @@ But no particular order and I might migrate parts or incorperate this into other
 ## Resources and helpfull links
 
 * <https://www.programiz.com/cpp-programming/library-function/cstdio/fscanf>
+* <https://stackoverflow.com/a/28979413/1671029> had some scanf issues, this is pretty smart.
+* <https://www.bellard.org/tinyemu/>
 
 ### 6502 specific
 
@@ -40,4 +43,9 @@ But no particular order and I might migrate parts or incorperate this into other
 * <http://archive.6502.org/datasheets/synertek_programming_manual.pdf>
 * <https://github.com/f0lg0/6502/tree/main/src/peripherals>
 * <https://github.com/caseif/c6502/blob/master/src/c6502/cpu.c>
+* <https://web.archive.org/web/20110113133322/http://impulzus.sch.bme.hu/6502/6502/> (use translate maybe)
 
+#### Decoding
+
+* <https://www.pagetable.com/?p=39>
+* <http://forum.6502.org/viewtopic.php?t=1494>
