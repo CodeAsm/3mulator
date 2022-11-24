@@ -50,16 +50,16 @@ struct Cpu {
 void CPUrun(Cpu *cpu, Mem *mem, Byte step){
 	
 	if(mem->mem[cpu->PC] == 0xa9){
-		printf("LDA #$%1x\n",mem->mem[(cpu->PC) +1] );
+		printf("LDA #$%02X\n",mem->mem[(cpu->PC) +1] );
 		cpu->PC++;
 		}
 	if(mem->mem[cpu->PC] == 0x8d){
-		printf("STA $%1x %1x\n",mem->mem[(cpu->PC) -2], mem->mem[(cpu->PC) -1]);
+		printf("STA $%02X%02X\n",mem->mem[(cpu->PC) +2], mem->mem[(cpu->PC) +1]);
 		cpu->PC++;
 		cpu->PC++;
 		}
 	cpu->PC++;
-	//printf("%x",cpu->PC);
+	///printf("%x",cpu->PC);
 	return;
 }
 
@@ -144,7 +144,7 @@ int main(){
 	int Cycles = 0;
 	while(1){
 		char str;
-		printf("Commands: C for continue, Q to quit, S 0x??? for show memory\n");
+		printf("Commands: C for continue, Q to quit, S 0x??? for show memory, R run for the remaining cycles\n");
 		scanf(" %c", &str);
 		switch (str) {
             case 'C':
@@ -162,7 +162,14 @@ int main(){
 		       	break;
 	        case 'Q':
 	        case 'q':
-			Cycles = CycleAmount;
+				Cycles = CycleAmount;
+	      		break;
+			case 'R':
+			case 'r':
+				while (Cycles < CycleAmount){
+					CPUrun(&cpu, &mem, 1);
+					Cycles++;
+				}
 	      		break;
 	        default:
 	            	break;
