@@ -7,6 +7,7 @@ using Word = unsigned short;	//2Bytes, 16bits
 using u32 = unsigned int;	//4Bytes, 32bits
 using s32 = signed int;		//4Bytes, 32bits
 
+// Memory of system
 struct Mem {
 		//CPU Memspace
 		Byte mem[ 1024 * 64 ]; 	//65.536bytes
@@ -45,10 +46,23 @@ struct Cpu {
 
 	}
 };
-//cpu for the cpu in use
-void CPUrun(Cpu cpu, Mem mem, Byte step){
+//Current cpu
+void CPUrun(Cpu *cpu, Mem *mem, Byte step){
+	
+	if(mem->mem[cpu->PC] == 0xa9){
+		printf("LDA #$%1x\n",mem->mem[(cpu->PC) +1] );
+		cpu->PC++;
+		}
+	if(mem->mem[cpu->PC] == 0x8d){
+		printf("STA $%1x %1x\n",mem->mem[(cpu->PC) -2], mem->mem[(cpu->PC) -1]);
+		cpu->PC++;
+		cpu->PC++;
+		}
+	cpu->PC++;
+	//printf("%x",cpu->PC);
 	return;
 }
+
 //cpu for the cpu in use
 //loc should be a hexvalue of the memory location to be seen
 //status boolean if you want the registers to be printed or not
@@ -111,10 +125,22 @@ int main(){
 	mem.mem[5] = 0x47;
 	mem.mem[6] = 0x48;
 	mem.mem[7] = 0x49;
+
+	mem.mem[10] = 0xa9;
+	mem.mem[11] = 0x01;
+	mem.mem[12] = 0x8d;
+	mem.mem[13] = 0x00;
+	mem.mem[14] = 0x02;
+	mem.mem[15] = 0xa9;
+	mem.mem[16] = 0x05;
+	mem.mem[17] = 0x8d;
+	mem.mem[18] = 0x01;
+	mem.mem[19] = 0x02;
+
 	printf("\n\t6502 Emu and d3comp\n");
 	printf( "\t-------------------\n\n");
 
-	int CycleAmount = 5;
+	int CycleAmount = 20;
 	int Cycles = 0;
 	while(1){
 		char str;
@@ -125,8 +151,8 @@ int main(){
 	        case 'c':
 	 	    		Cycles++;
 					//do cpu step
-					CPUrun(cpu, mem, 1);
-				   	PrintStats(cpu, mem, cpu.PC, true);
+					CPUrun(&cpu, &mem, 1);
+				   //	PrintStats(cpu, mem, cpu.PC, true);
 					printf("Cycle: %d \n", Cycles);
 			    	break;
 	        case 'S':
