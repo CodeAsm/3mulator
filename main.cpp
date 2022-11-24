@@ -58,6 +58,20 @@ void CPUrun(Cpu *cpu, Mem *mem, Byte step){
 		cpu->PC++;
 		cpu->PC++;
 		}
+	
+	if(mem->mem[cpu->PC] == 0xaa){
+		printf("TAX\n");
+		cpu->X=cpu->A;
+	}
+
+	if(mem->mem[cpu->PC] == 0xe8){
+		printf("INX\n");
+		cpu->X++;
+	}
+
+	if(mem->mem[cpu->PC] == 0x00)
+	printf("HLT\n");
+
 	cpu->PC++;
 	///printf("%x",cpu->PC);
 	return;
@@ -117,25 +131,13 @@ int main(){
 	Cpu cpu;
 	Mem mem;
 	cpu.Reset(mem);
-	mem.mem[0] = 0x42;
-	mem.mem[1] = 0x43;
-	mem.mem[2] = 's';
-	mem.mem[3] = 0x45;
-	mem.mem[4] = 0x46;
-	mem.mem[5] = 0x47;
-	mem.mem[6] = 0x48;
-	mem.mem[7] = 0x49;
+	mem.mem[0] = 0xa9;
+	mem.mem[1] = 0xaa;
+	mem.mem[2] = 0xe8;
+	mem.mem[3] = 0x69;
+	mem.mem[4] = 0xc4;
+	mem.mem[5] = 0x00;
 
-	mem.mem[10] = 0xa9;
-	mem.mem[11] = 0x01;
-	mem.mem[12] = 0x8d;
-	mem.mem[13] = 0x00;
-	mem.mem[14] = 0x02;
-	mem.mem[15] = 0xa9;
-	mem.mem[16] = 0x05;
-	mem.mem[17] = 0x8d;
-	mem.mem[18] = 0x01;
-	mem.mem[19] = 0x02;
 
 	printf("\n\t6502 Emu and d3comp\n");
 	printf( "\t-------------------\n\n");
