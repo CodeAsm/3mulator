@@ -47,34 +47,57 @@ struct Cpu {
 	}
 };
 //Current cpu
-void CPUrun(Cpu *cpu, Mem *mem, Byte step){
+int CPUrun(Cpu *cpu, Mem *mem, Byte step){
 	
-	if(mem->mem[cpu->PC] == 0xa9){
+	switch (mem->mem[cpu->PC])
+	{
+	case 0xa9:
 		printf("LDA #$%02X\n",mem->mem[(cpu->PC) +1] );
 		cpu->PC++;
-		}
-	if(mem->mem[cpu->PC] == 0x8d){
-		printf("STA $%02X%02X\n",mem->mem[(cpu->PC) +2], mem->mem[(cpu->PC) +1]);
 		cpu->PC++;
-		cpu->PC++;
-		}
-	
-	if(mem->mem[cpu->PC] == 0xaa){
-		printf("TAX\n");
-		cpu->X=cpu->A;
-	}
+		break;
 
-	if(mem->mem[cpu->PC] == 0xe8){
+	case 0x8d:
+	printf("STA $%02X%02X\n",mem->mem[(cpu->PC) +2], mem->mem[(cpu->PC) +1]);
+		cpu->PC++;
+		cpu->PC++;
+		cpu->PC++;
+	break;
+
+	case 0x4c:
+	printf("JMP $%02X%02X\n",mem->mem[(cpu->PC) +2], mem->mem[(cpu->PC) +1]);
+	cpu->PC = mem->mem[(cpu->PC) +2];
+	break;
+
+	case 0x69:
+		printf("ADC $%02X\n",mem->mem[(cpu->PC) +1]);
+		cpu->A=mem->mem[(cpu->PC) +1];
+		cpu->PC++;
+		cpu->PC++;
+	break;
+
+	case 0xaa:
+	printf("TAX\n");
+		cpu->X=cpu->A;
+		cpu->PC++;
+	break;
+
+	case 0xe8:
 		printf("INX\n");
 		cpu->X++;
+		cpu->PC++;
+	break;
+
+	case 0x00:
+		printf("BRK\n");
+	return 1;
+
+	default:
+		printf("Unkown instruction %#02x\n", mem->mem[cpu->PC]);
+		break;
 	}
-
-	if(mem->mem[cpu->PC] == 0x00)
-	printf("HLT\n");
-
-	cpu->PC++;
 	///printf("%x",cpu->PC);
-	return;
+	return 0;
 }
 
 //cpu for the cpu in use
@@ -137,6 +160,9 @@ int main(){
 	mem.mem[3] = 0x69;
 	mem.mem[4] = 0xc4;
 	mem.mem[5] = 0x00;
+	mem.mem[65532] = 0x4c;	//jmp to (0x0000)
+	mem.mem[65533] = 0x00;	//adress lowbyte
+	mem.mem[65534] = 0x00; 	//adress highbyte
 
 
 	printf("\n\t6502 Emu and d3comp\n");
@@ -153,31 +179,42 @@ int main(){
 	        case 'c':
 	 	    		Cycles++;
 					//do cpu step
-					CPUrun(&cpu, &mem, 1);
+					if (!CPUrun(&cpu, &mem, 1)){	
+						Cycles++;
+					}else{
+						printf("-- System halted --\n");
+						printf("Try changing PC or alter code\n");
+						Cycles = CycleAmount;
+					}
 				   //	PrintStats(cpu, mem, cpu.PC, true);
 					printf("Cycle: %d \n", Cycles);
 			    	break;
 	        case 'S':
 	        case 's':
+					if(str)
 	            	PrintStats(cpu, mem, 0x00, true);
 					printf("Cycle: %d \n", Cycles);
 		       	break;
 	        case 'Q':
 	        case 'q':
-				Cycles = CycleAmount;
+				Cycles = -1;
 	      		break;
 			case 'R':
 			case 'r':
 				while (Cycles < CycleAmount){
-					CPUrun(&cpu, &mem, 1);
-					Cycles++;
+					if (!CPUrun(&cpu, &mem, 1)){
+						Cycles++;
+					}else{
+						printf("-- System halted --\n");
+						Cycles = CycleAmount;
+					}
 				}
 	      		break;
 	        default:
 	            	break;
 		}
 
-		if(Cycles >= CycleAmount){
+		if(Cycles == -1){
 			break;
 		}
 		str =0x0000; //strip away extra chars
