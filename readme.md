@@ -49,3 +49,7 @@ But no particular order and I might migrate parts or incorperate this into other
 
 * <https://www.pagetable.com/?p=39>
 * <http://forum.6502.org/viewtopic.php?t=1494>
+
+### Pointers
+
+* <https://www.w3schools.blog/how-to-print-value-of-pointer-in-c>
