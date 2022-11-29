@@ -47,14 +47,15 @@ struct Cpu {
 	}
 };
 //Current cpu
-int CPUrun(Cpu *cpu, Mem *mem, Byte step){
-	
+int CPUrun(Cpu *cpu, Mem *mem, int* cycle){
+	printf("%d \n", *cycle);
 	switch (mem->mem[cpu->PC])
 	{
 	case 0xa9:
 		printf("LDA #$%02X\n",mem->mem[(cpu->PC) +1] );
 		cpu->PC++;
 		cpu->PC++;
+		*cycle+=2;
 		break;
 
 	case 0x8d:
@@ -179,7 +180,7 @@ int main(){
 	        case 'c':
 	 	    		Cycles++;
 					//do cpu step
-					if (!CPUrun(&cpu, &mem, 1)){	
+					if (!CPUrun(&cpu, &mem, &Cycles)){	
 						Cycles++;
 					}else{
 						printf("-- System halted --\n");
@@ -202,8 +203,8 @@ int main(){
 			case 'R':
 			case 'r':
 				while (Cycles < CycleAmount){
-					if (!CPUrun(&cpu, &mem, 1)){
-						Cycles++;
+					if (!CPUrun(&cpu, &mem, &Cycles)){
+						//Cycles++;
 					}else{
 						printf("-- System halted --\n");
 						Cycles = CycleAmount;
