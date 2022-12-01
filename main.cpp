@@ -48,11 +48,12 @@ struct Cpu {
 };
 //Current cpu
 int CPUrun(Cpu *cpu, Mem *mem, int* cycle){
-	printf("%d \n", *cycle);
+	//printf("%d \n", *cycle);
 	switch (mem->mem[cpu->PC])
 	{
 	case 0xa9:
 		printf("LDA #$%02X\n",mem->mem[(cpu->PC) +1] );
+		cpu->A=mem->mem[(cpu->PC) +1];
 		cpu->PC++;
 		cpu->PC++;
 		*cycle+=2;
@@ -63,34 +64,40 @@ int CPUrun(Cpu *cpu, Mem *mem, int* cycle){
 		cpu->PC++;
 		cpu->PC++;
 		cpu->PC++;
+		*cycle+=4;
 	break;
 
 	case 0x4c:
 	printf("JMP $%02X%02X\n",mem->mem[(cpu->PC) +2], mem->mem[(cpu->PC) +1]);
-	cpu->PC = mem->mem[(cpu->PC) +2];
+		cpu->PC = mem->mem[(cpu->PC) +2];
+		*cycle+=3;
 	break;
 
 	case 0x69:
 		printf("ADC $%02X\n",mem->mem[(cpu->PC) +1]);
-		cpu->A=mem->mem[(cpu->PC) +1];
+		cpu->A=cpu->A+mem->mem[(cpu->PC) +1];
 		cpu->PC++;
 		cpu->PC++;
+		*cycle+=3;
 	break;
 
 	case 0xaa:
 	printf("TAX\n");
 		cpu->X=cpu->A;
 		cpu->PC++;
+		*cycle+=2;
 	break;
 
 	case 0xe8:
 		printf("INX\n");
 		cpu->X++;
 		cpu->PC++;
+		*cycle+=2;
 	break;
 
 	case 0x00:
 		printf("BRK\n");
+		*cycle+=7;
 	return 1;
 
 	default:
@@ -160,7 +167,9 @@ int main(){
 	mem.mem[2] = 0xe8;
 	mem.mem[3] = 0x69;
 	mem.mem[4] = 0xc4;
-	mem.mem[5] = 0x00;
+	mem.mem[5] = 0x4c;
+	mem.mem[6] = 0x00;
+	mem.mem[7] = 0x00;
 	mem.mem[65532] = 0x4c;	//jmp to (0x0000)
 	mem.mem[65533] = 0x00;	//adress lowbyte
 	mem.mem[65534] = 0x00; 	//adress highbyte
@@ -202,6 +211,7 @@ int main(){
 	      		break;
 			case 'R':
 			case 'r':
+				CycleAmount = 200;
 				while (Cycles < CycleAmount){
 					if (!CPUrun(&cpu, &mem, &Cycles)){
 						//Cycles++;
