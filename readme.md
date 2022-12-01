@@ -42,6 +42,8 @@ But no particular order and I might migrate parts or incorperate this into other
 * <https://github.com/Klaus2m5/6502_65C02_functional_tests/blob/master/6502_functional_test.a65>
 * <http://archive.6502.org/datasheets/synertek_programming_manual.pdf>
 * <https://github.com/f0lg0/6502/tree/main/src/peripherals>
+* <https://skilldrick.github.io/easy6502/>
+* <https://www.masswerk.at/6502/6502_instruction_set.html#NOPs>
 * <https://github.com/caseif/c6502/blob/master/src/c6502/cpu.c>
 * <https://web.archive.org/web/20110113133322/http://impulzus.sch.bme.hu/6502/6502/> (use translate maybe)
 
