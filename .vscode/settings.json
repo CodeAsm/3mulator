@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/codeasm/Projects/8bit/3mulator",
+            "binaryPath": "/home/codeasm/Projects/8bit/3mulator/3mu",
+            "binaryArgs": []
+        }
+    ]
+}
