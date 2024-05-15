@@ -1,11 +1,17 @@
 CXX=gcc
-CXXFLAGS=-I.
+CXXFLAGS=-I.$(addprefix -I,$(INC_DIRS))
 CXXFLAGS += -g -Wall
 LIBS +=
 OBJDIR=obj/
+SRC_DIRS=hw/ ui/ cores/ include/
+# Every folder in ./src will need to be passed to GCC so that it can find header files
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+# Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
+INC_FLAGS := 
+
 SOURCES = main.cpp
 OBJS = $(addprefix $(OBJDIR), $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
-EXE = main
+EXE = 3mu
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
@@ -20,11 +26,11 @@ $(OBJDIR)%.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(EXE): $(OBJS)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS) -o $(EXE) 
+	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS) 
 
 all:$(EXE)
 	@echo Build complete for Linux $(shell git describe --dirty --always --tags)
-	./main
+	./3mu
 
 .PHONY: clean
 clean:

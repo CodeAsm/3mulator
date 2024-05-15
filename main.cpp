@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "main.hxx"
 
 using SByte = char;		//1Byte,  8bits
 using Byte = unsigned char;	//1Byte,  8bits
