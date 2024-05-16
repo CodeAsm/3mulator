@@ -11,7 +11,7 @@ it shouldnt be too hard for now
 
 ## How to run
 
-``./main`` should do it.
+``./3mu`` should do it.
 once running, a few commands should work:
 C to continue
 Q to quit
