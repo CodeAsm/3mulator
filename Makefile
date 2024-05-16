@@ -1,7 +1,7 @@
-CXX=gcc
+CXX=g++
 CXXFLAGS=-I.$(addprefix -I,$(INC_DIRS))
-CXXFLAGS += -g -Wall
-LIBS +=
+CXXFLAGS += -g -Wall -Wformat
+LIBS += 
 OBJDIR=obj/
 SRC_DIRS=hw/ ui/ cores/ include/
 # Every folder in ./src will need to be passed to GCC so that it can find header files
@@ -23,14 +23,13 @@ endif
 
 $(OBJDIR)%.o:%.cpp
 	mkdir -p $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
 
 $(EXE): $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS) 
 
 all:$(EXE)
 	@echo Build complete for Linux $(shell git describe --dirty --always --tags)
-	./3mu
 
 .PHONY: clean
 clean:

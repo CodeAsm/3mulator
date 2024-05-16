@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include "main.hxx"
 
+
+#ifndef VERSION
+#define VERSION "1.1"//; //TODO: this isnt working if we forget to define version.
+#endif
+
+
 using SByte = char;		//1Byte,  8bits
 using Byte = unsigned char;	//1Byte,  8bits
 using Word = unsigned short;	//2Bytes, 16bits
@@ -177,7 +183,8 @@ int main(){
 
 
 	printf("\n\t6502 Emu and d3comp\n");
-	printf( "\t-------------------\n\n");
+	printf( "\t-------------------\n");
+    printf("\tV: %s\n\n", VERSION);
 
 	int CycleAmount = 20;
 	int Cycles = 0;
