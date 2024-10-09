@@ -48,3 +48,18 @@ ADC $01
 	mem.mem[5] = 0x47;
 	mem.mem[6] = 0x48;
 	mem.mem[7] = 0x49;
+
+
+
+    mem.mem[0] = 0xa9;
+	mem.mem[1] = 0xaa;
+	mem.mem[2] = 0xe8;
+	mem.mem[3] = 0x69;
+	mem.mem[4] = 0xc4;
+	mem.mem[5] = 0x4c;
+	mem.mem[6] = 0x00;
+	mem.mem[7] = 0x00;
+	mem.mem[65532] = 0x4c;	//jmp to (0x0000)
+	mem.mem[65533] = 0x00;	//adress lowbyte
+	mem.mem[65534] = 0x00; 	//adress highbyte
+
