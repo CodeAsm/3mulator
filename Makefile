@@ -1,7 +1,8 @@
 CXX=g++
 CXXFLAGS=-I.$(addprefix -I,$(INC_DIRS))
 CXXFLAGS += -g -Wall -Wformat
-LIBS += 
+CXXFLAGS +=  -L/usr/lib -lSDL2
+LIBS += -L/usr/lib -lSDL2
 OBJDIR=obj/
 SRC_DIRS=hw/ ui/ cores/ include/
 # Every folder in ./src will need to be passed to GCC so that it can find header files
@@ -9,7 +10,7 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := 
 
-SOURCES = main.cpp cores/6502.cpp
+SOURCES = main.cpp cores/6502.cpp hw/SAA5050.cpp
 OBJS = $(addprefix $(OBJDIR), $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
 EXE = 3mu
 
@@ -26,6 +27,10 @@ $(OBJDIR)%.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
 
 $(OBJDIR)%.o: cores/%.cpp
+	mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
+
+$(OBJDIR)%.o: hw/%.cpp
 	mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "main.hxx"
 #include "cores/6502.hxx"
-
+#include "hw/SAA5050.hxx"
 
 #ifndef VERSION
 #define VERSION "1.1"//; //TODO: this isnt working if we forget to define version.
@@ -79,6 +79,7 @@ int main(){
 	printf("\n\t6502 Emu and d3comp\n");
 	printf( "\t-------------------\n");
     printf("\tV: %s\n\n", VERSION);
+	runEmulator(); // Commented out as runEmulator is undefined
 
 	int CycleAmount = 20;
 	int Cycles = 0;
