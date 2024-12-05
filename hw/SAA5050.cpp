@@ -22,17 +22,16 @@ void SAA5050::checkAddressSpace(uint16_t address, uint8_t* memory) {
     SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
 
     // Calculate the scale factor
-    int scaleX = windowWidth / 320; // Assuming 40 characters per line and each character is 8 pixels wide
-    int scaleY = windowHeight / 240; // Assuming 30 lines and each character is 8 pixels high
+    int scaleX = windowWidth / 640; // Assuming 80 characters per line and each character is 8 pixels wide
+    int scaleY = windowHeight / 192; // Assuming 24 lines and each character is 8 pixels high
     int scale = std::min(scaleX, scaleY);
-
 
     if (address >= startAddress && address <= endAddress) {
         // Call render function or handle memory changes
-        for (int j = 0; j < 30; ++j) { // Assuming 30 lines of characters
-            for (int i = 0; i < 40; ++i) { // Assuming SAA5050 can draw 40 characters per line
-            uint8_t value = memory[address + i + j * 40];
-            renderCharacter(value, i * 8 * scale, j * 8 * scale, scale); // Assuming each character is 8 pixels wide and 8 pixels high
+        for (int j = 0; j < 24; ++j) { // Assuming 24 lines of characters
+            for (int i = 0; i < 80; ++i) { // Assuming SAA5050 can draw 80 characters per line
+                uint8_t value = memory[address + i + j * 80];
+                renderCharacter(value, i * 8 * scale, j * 8 * scale, scale); // Assuming each character is 8 pixels wide and 8 pixels high
             }
         }
     }
@@ -66,7 +65,6 @@ void SAA5050::renderCharacter(uint8_t value, int x, int y, int scale) {
     // Set the draw color to white (foreground)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-  
     // Draw the character to the screen with scaling
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
@@ -79,7 +77,6 @@ void SAA5050::renderCharacter(uint8_t value, int x, int y, int scale) {
             }
         }
     }
-
 }
 
 void runEmulator() {
@@ -107,13 +104,29 @@ void runEmulator() {
     memory[0x8005] = 0x4c;
     memory[0x8006] = 0x00;
     memory[0x8007] = 0x00;
-    memory[8008] = 0x4c;  // jmp to (0x0000)
-    memory[8009] = 0x00;  // address low byte
-    memory[8010] = 0x00;  // address high byte
+    memory[0x8008] = 0x4c;  // jmp to (0x0000)
+    memory[0x8009] = 0x00;  // address low byte
+    memory[0x800a] = 0x00;  // address high byte
 
-    saa5050.checkAddressSpace(address, memory);
-    std::cout << "Press Enter to continue...";
-    std::cin.ignore();
+    // Set a bunch more memory locations to 0xFF
+    for (uint16_t i = 0x800b; i < 0x8100; ++i) {
+        memory[i] = i;
+    }
+
+    bool running = true;
+    SDL_Event event;
+    while (running) {
+        saa5050.checkAddressSpace(address, memory);
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_q) {
+                    running = false;
+                }
+            }
+        }
+    }
 
     SDL_DestroyWindow(window);
     SDL_Quit();
