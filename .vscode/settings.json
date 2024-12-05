@@ -5,5 +5,8 @@
             "binaryPath": "/home/codeasm/Projects/8bit/3mulator/3mu",
             "binaryArgs": []
         }
-    ]
+    ],
+    "files.associations": {
+        "iostream": "cpp"
+    }
 }
