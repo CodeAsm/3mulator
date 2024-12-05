@@ -1,4 +1,4 @@
-# 8bit Emu and d3com
+# 8bit Emu (3mu) and d3com
 
 My personal small emulation and decompilation project for smaller 8bit like cpu systems.
 It probably wont work, doesnt provide what you where looking for and programmed the way you like.
@@ -17,6 +17,15 @@ C to continue
 Q to quit
 S to show a certain portion of memory (not implemented yet)
 
+## SAA5050
+***!! work in progress !!***
+
+Ive added a prototype display in SDL, I called it the SAA5050. Currently it does NOT function as one tho. try this branch and see a display popup showing the current ram.
+
+press 'q' to quit this display/emu for now.
+
+![Image](images/SAA5050.png)
+
 ## Ideas
 
 Some basic ideas I have that I might be able to achieve:
@@ -24,6 +33,7 @@ Some basic ideas I have that I might be able to achieve:
 * Add more cpu types like a z80, 8052 and maybe 8086
 * load roms
 * GPU's for various cpu (simple first hehe)
+    * added SAA5050 prototype, doesnt work yet
 * decompile for various roms/pieces of code
 * NES (ow boy, probably buggy and non working)
 
