@@ -11,6 +11,8 @@ public:
     ~SAA5050();
     void checkAddressSpace(uint16_t address, uint8_t* memory);
 
+void renderCharacter(uint8_t value, int x, int y, int scale);
+
 private:
     SDL_Renderer* renderer;
     void render();
@@ -19,6 +21,6 @@ private:
 };
 
 // Declare runEmulator() function
-int runEmulator();
+void runEmulator();
 
 #endif // SAA5050_HXX
