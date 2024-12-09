@@ -63,3 +63,65 @@ ADC $01
 	mem.mem[65533] = 0x00;	//adress lowbyte
 	mem.mem[65534] = 0x00; 	//adress highbyte
 
+
+
+## Video
+
+1. Monochrome Display Adapter (MDA):
+
+    Memory Range: 0xB0000 - 0xB0FFF (4 KB)
+    Text Mode: The MDA adapter only supported text mode with a resolution of 80x25 characters.
+    Usage: Each character in the text mode occupied 2 bytes:
+        The first byte stored the ASCII character code.
+        The second byte stored the attribute (e.g., intensity, underline).
+
+2. Color Graphics Adapter (CGA):
+
+    Memory Range: 0xB8000 - 0xBFFFF (32 KB)
+    Text Mode: CGA's text modes included 40x25 and 80x25 characters.
+    Usage: Similar to MDA, text modes used 2 bytes per character:
+        The first byte for the character code.
+        The second byte for foreground and background color attributes.
+
+3. Hercules Graphics Card:
+
+    Memory Range: 0xB0000 - 0xB7FFF (32 KB)
+    Modes Supported: Text and high-resolution monochrome graphics (720x348 pixels).
+    Usage in Text Mode: Hercules used the same mapping as MDA for text.
+
+4. VGA and Later:
+
+    VGA maintained backward compatibility with CGA and MDA, keeping the 0xB8000 memory range for text modes in color and 0xB0000 for monochrome.
+
+Example Code in Assembly (Text Mode Write):
+
+This example writes "Hello" in white text on a black background at the top-left corner of the screen in 80x25 mode:
+
+mov ax, 0xB800        ; Base segment for CGA text mode
+mov es, ax            ; Load segment into ES
+mov di, 0             ; Start at the top-left corner
+mov byte [es:di], 'H' ; Character 'H'
+mov byte [es:di+1], 0x0F ; White text on black background
+mov byte [es:di+2], 'e'
+mov byte [es:di+3], 0x0F
+mov byte [es:di+4], 'l'
+mov byte [es:di+5], 0x0F
+mov byte [es:di+6], 'l'
+mov byte [es:di+7], 0x0F
+mov byte [es:di+8], 'o'
+mov byte [es:di+9], 0x0F
+
+Access in Higher-Level Languages:
+
+In C (DOS), you can directly access these memory locations using pointers:
+
+#include <dos.h>
+
+void write_text() {
+    unsigned char far* video_memory = (unsigned char far*)0xB8000000;
+    video_memory[0] = 'H';  // Character
+    video_memory[1] = 0x0F; // White text on black
+}
+
+These mappings and examples illustrate how text modes were implemented using specific video memory regions, enabling the CPU to directly control the display. Let me know if you'd like help experimenting with this in an emulator!
+
