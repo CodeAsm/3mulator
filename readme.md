@@ -17,7 +17,24 @@ C to continue
 Q to quit
 S to show a certain portion of memory (not implemented yet)
 
-## SAA5050
+## Cores
+
+Currently we have 2 cores, or also known as CPU architectures.
+These cores may be 1 type to select but cover multiple variants or types. subtype selection will be added someday.
+
+Currently supported or added cores:
+- 6502
+- 8080
+
+planned 
+- 8088
+- Z80
+- M68K
+
+## Harware
+To be done, define how custom hardware can be added.
+
+### SAA5050
 ***!! work in progress !!***
 
 Ive added a prototype display in SDL, I called it the SAA5050. Currently it does NOT function as one tho. try this branch and see a display popup showing the current ram.
