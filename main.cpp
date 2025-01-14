@@ -79,7 +79,9 @@ int main(){
 	printf("\n\t6502 Emu and d3comp\n");
 	printf( "\t-------------------\n");
     printf("\tV: %s\n\n", VERSION);
+	
 	runEmulator(); // Commented out as runEmulator is undefined
+	return 0;
 
 	int CycleAmount = 20;
 	int Cycles = 0;
