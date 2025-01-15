@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "main.hxx"
 #include "cores/6502.hxx"
-#include "hw/SAA5050.hxx"
+#include "ui/window.hxx"
 
 #ifndef VERSION
 #define VERSION "1.1"//; //TODO: this isnt working if we forget to define version.
@@ -58,6 +58,32 @@ void PrintStats(Cpu cpu, Mem mem, int loc, bool status){
 	}
 }
 
+void checkAddressSpace(uint16_t address, uint8_t* memory, gui* guii) {
+	int scale = 3;
+	int charWidth = 5 + 1; // 5 pixels wide + 1 pixel space
+	int charHeight = 9 + 1; // 9 pixels high + 1 pixel space
+	int windowWidth = 40 * charWidth * scale;
+	int windowHeight = 24 * charHeight * scale;
+	// Calculate the scale factor
+	int scaleX = windowWidth / (40 * 6); // 40 characters per line, each character is 5 pixels wide + 1 pixel space
+	int scaleY = windowHeight / (24 * 10); // 24 lines, each character is 9 pixels high + 1 pixel space
+	//int scale = std::min(scaleX, scaleY);
+
+	const uint16_t startAddress = 0x8000; // Example start address
+	const uint16_t endAddress = 0x87FF;   // Example end address
+
+	if (address >= startAddress && address <= endAddress) {
+		// Call render function or handle memory changes
+		for (int j = 0; j < 24; ++j) { // 24 lines of characters
+			for (int i = 0; i < 40; ++i) { // 40 characters per line
+				guii->drawCharacter(memory[address + i + j * 40], i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+			}
+		}
+	}
+	//SDL_RenderPresent(guii->renderer);
+}
+
+
 int main(){
 
 	Cpu cpu;
@@ -80,8 +106,56 @@ int main(){
 	printf( "\t-------------------\n");
     printf("\tV: %s\n\n", VERSION);
 	
-	runEmulator(); // Commented out as runEmulator is undefined
-	return 0;
+	/// gui
+	int scale = 3;
+    int charWidth = 5 + 1; // 5 pixels wide + 1 pixel space
+    int charHeight = 9 + 1; // 9 pixels high + 1 pixel space
+    int windowWidth = 40 * charWidth * scale;
+    int windowHeight = 24 * charHeight * scale;
+
+    gui gui(windowWidth, windowHeight, scale);
+ // Example memory and address
+    uint8_t memory[65536] = {0};
+    uint16_t address = 0x8000;
+
+	memory[0x8000] = 0xa9;
+    memory[0x8001] = 0xaa;
+    memory[0x8002] = 0xe8;
+    memory[0x8003] = 0x69;
+    memory[0x8004] = 0xc4;
+    memory[0x8005] = 0x4c;
+    memory[0x8006] = 0x00;
+    memory[0x8007] = 0x00;
+    memory[0x8008] = 0x4c;  // jmp to (0x0000)
+    memory[0x8009] = 0x00;  // address low byte
+    memory[0x800a] = 0x00;  // address high byte
+    // Main loop
+    bool running = true;
+    SDL_Event event;
+    while (running) {
+         while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_q) {
+                    running = false;
+                }
+            }
+        }
+		
+
+        gui.clear();
+
+        // Example drawing
+        //gui.drawCharacter(memory[address], 10, 10, scale);
+		checkAddressSpace(0x8000, memory, &gui);
+
+        gui.present();
+        SDL_Delay(100); // Delay to limit frame rate
+    }
+
+    return 0;
+	/// gui
 
 	int CycleAmount = 20;
 	int Cycles = 0;

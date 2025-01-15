@@ -10,7 +10,7 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := 
 
-SOURCES = main.cpp cores/6502.cpp hw/SAA5050.cpp
+SOURCES = main.cpp cores/6502.cpp hw/SAA5050.cpp io/window.cpp
 OBJS = $(addprefix $(OBJDIR), $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
 EXE = 3mu
 
@@ -31,6 +31,11 @@ $(OBJDIR)%.o: cores/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
 
 $(OBJDIR)%.o: hw/%.cpp
+	mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
+
+
+$(OBJDIR)%.o: ui/%.cpp
 	mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
 
