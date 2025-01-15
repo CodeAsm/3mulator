@@ -50,16 +50,6 @@ public:
 
     // Other methods for CPU operations can be added here
 
-private:
-    uint8_t memory[MEMORY_SIZE];
-    uint8_t registers[7];
-    uint16_t pc, sp;
-    uint8_t flags;
-    uint8_t io_ports[IO_PORTS];
-};
-
-
-
 // registers[0] - B
 // registers[1] - C
 // registers[2] - D
@@ -142,8 +132,8 @@ void set_conio_terminal_mode() {
     memcpy(&new_termios, &new_termios, sizeof(new_termios));
 
     /* register cleanup handler, and set the new terminal mode */
-    atexit(reset_terminal_mode);
-    signal(SIGINT, handle_signal); // Catch Ctrl-C
+  //  atexit(reset_terminal_mode);
+  //  signal(SIGINT, handle_signal); // Catch Ctrl-C
     cfmakeraw(&new_termios);
     tcsetattr(0, TCSANOW, &new_termios);
 }
@@ -1548,21 +1538,30 @@ void emulate_8080() {
     }
 }
 
+private:
+    uint8_t memory[MEMORY_SIZE];
+    uint8_t registers[7];
+    uint16_t pc, sp;
+    uint8_t flags;
+    uint8_t io_ports[IO_PORTS];
+};
+
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <bios> [harddisk]\n", argv[0]);
         return 1;
     }
 
-    set_conio_terminal_mode();
+   // set_conio_terminal_mode();
 
-    load_bios(argv[1]);
+   // load_bios(argv[1]);
     if (argc > 2) {
-        load_harddisk(argv[2]);
+     //   load_harddisk(argv[2]);
     }
 
-    emulate_8080();
-    reset_terminal_mode();
+    //emulate_8080();
+    //reset_terminal_mode();
     return 0;
 }
 
