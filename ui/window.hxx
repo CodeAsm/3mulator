@@ -12,7 +12,8 @@ public:
     void clear();
     void present();
     void drawPoint(int x, int y);
-    void drawCharacter(uint8_t value, int x, int y, int scale);
+    void drawHexCharacter(char value, int x, int y, int scale);
+    void drawAsciiCharacter(char value, int x, int y, int scale);
 
 private:
     SDL_Window* window;

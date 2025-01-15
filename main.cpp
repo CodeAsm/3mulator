@@ -58,7 +58,7 @@ void PrintStats(Cpu cpu, Mem mem, int loc, bool status){
 	}
 }
 
-void checkAddressSpace(uint16_t address, uint8_t* memory, gui* guii) {
+void checkAddressSpace(uint16_t address, char* memory, gui* guii) {
 	int scale = 3;
 	int charWidth = 5 + 1; // 5 pixels wide + 1 pixel space
 	int charHeight = 9 + 1; // 9 pixels high + 1 pixel space
@@ -76,7 +76,42 @@ void checkAddressSpace(uint16_t address, uint8_t* memory, gui* guii) {
 		// Call render function or handle memory changes
 		for (int j = 0; j < 24; ++j) { // 24 lines of characters
 			for (int i = 0; i < 40; ++i) { // 40 characters per line
-				guii->drawCharacter(memory[address + i + j * 40], i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+				guii->drawHexCharacter(memory[address + i + j * 40], i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+			}
+		}
+	}
+	//SDL_RenderPresent(guii->renderer);
+}
+
+
+void drawMem(uint16_t address, char* memory, gui* guii) {
+	int scale = 3;
+	int charWidth = 5 + 1; // 5 pixels wide + 1 pixel space
+	int charHeight = 9 + 1; // 9 pixels high + 1 pixel space
+	int windowWidth = 40 * charWidth * scale;
+	int windowHeight = 24 * charHeight * scale;
+	// Calculate the scale factor
+	int scaleX = windowWidth / (40 * 6); // 40 characters per line, each character is 5 pixels wide + 1 pixel space
+	int scaleY = windowHeight / (24 * 10); // 24 lines, each character is 9 pixels high + 1 pixel space
+	//int scale = std::min(scaleX, scaleY);
+
+	const uint16_t startAddress = 0x8000; // Example start address
+	const uint16_t endAddress = 0x87FF;   // Example end address
+
+
+	int memcount = 0;
+	if (address >= startAddress && address <= endAddress) {
+		// Call render function or handle memory changes
+		for (int j = 0; j < 24; ++j) { // 24 lines of characters
+			for (int i = 0; i < 40; ++i) { // 40 characters per line
+				
+				char charByte1 = memory[address + memcount];
+				char charByte2 = memory[address + 1 + memcount];
+				uint8_t charBytes = (charByte1 << 8) | charByte2; // Combine the two bytes
+				char printable = charBytes & 0xFF; // Extract the lower byte for the character
+				memcount += 1;
+				
+				guii->drawAsciiCharacter(charBytes, i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
 			}
 		}
 	}
@@ -115,22 +150,33 @@ int main(){
 
     gui gui(windowWidth, windowHeight, scale);
  // Example memory and address
-    uint8_t memory[65536] = {0};
+    char memory[65536] = {0};
     uint16_t address = 0x8000;
-
-	memory[0x8000] = 0xa9;
-    memory[0x8001] = 0xaa;
-    memory[0x8002] = 0xe8;
-    memory[0x8003] = 0x69;
-    memory[0x8004] = 0xc4;
-    memory[0x8005] = 0x4c;
-    memory[0x8006] = 0x00;
-    memory[0x8007] = 0x00;
-    memory[0x8008] = 0x4c;  // jmp to (0x0000)
-    memory[0x8009] = 0x00;  // address low byte
-    memory[0x800a] = 0x00;  // address high byte
+	
+	const char* hello_world2 = "BASIC 1.0";
+	for (int i = 0; hello_world2[i] != '\0'; ++i) {
+		memory[0x8000 + i] = hello_world2[i];
+	}
+	/*memory[0x8000] = 0x3;
+    memory[0x8001] = 0x4;
+    memory[0x8002] = 0x3;
+    memory[0x8003] = 0x1;
+    memory[0x8004] = 0x3;
+    memory[0x8005] = 0x0;
+    memory[0x8006] = 0x0;
+    memory[0x8007] = 0x0;
+    memory[0x8008] = 0x2;  // jmp to (0x0000)
+    memory[0x8009] = 0x4;  // address low byte
+    memory[0x800a] = 0x1;  // address high byte
+	*/
+	// Add the word "HELLO_WORLD" to memory starting at address 0x8010
+	const char* hello_world = "HELLO_WORLD! [>$^]";
+	for (int i = 0; hello_world[i] != '\0'; ++i) {
+		memory[0x8010 + i] = hello_world[i];
+	}
     // Main loop
     bool running = true;
+    bool hex = true;
     SDL_Event event;
     while (running) {
          while (SDL_PollEvent(&event)) {
@@ -141,6 +187,9 @@ int main(){
                     running = false;
                 }
             }
+			if (event.key.keysym.sym == SDLK_h) {
+			hex = !hex;
+			}
         }
 		
 
@@ -148,7 +197,11 @@ int main(){
 
         // Example drawing
         //gui.drawCharacter(memory[address], 10, 10, scale);
+		if (hex)
 		checkAddressSpace(0x8000, memory, &gui);
+		else
+		drawMem(0x8000, memory, &gui);
+
 
         gui.present();
         SDL_Delay(100); // Delay to limit frame rate
