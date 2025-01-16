@@ -69,17 +69,21 @@ void checkAddressSpace(uint16_t address, char* memory, gui* guii) {
 	int scaleY = windowHeight / (24 * 10); // 24 lines, each character is 9 pixels high + 1 pixel space
 	//int scale = std::min(scaleX, scaleY);
 
-	const uint16_t startAddress = 0x8000; // Example start address
-	const uint16_t endAddress = 0x87FF;   // Example end address
+	//const uint16_t startAddress = 0x8000; // Example start address
+	//const uint16_t endAddress = 0x87FF;   // Example end address
 
-	if (address >= startAddress && address <= endAddress) {
+	//if (address >= startAddress && address <= endAddress) {
 		// Call render function or handle memory changes
 		for (int j = 0; j < 24; ++j) { // 24 lines of characters
 			for (int i = 0; i < 40; ++i) { // 40 characters per line
-				guii->drawHexCharacter(memory[address + i + j * 40], i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+				uint8_t byte = memory[address + i + j * 40];
+				//guii->drawHexCharacter(memory[address + i + j * 40], i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+				 guii->drawHexCharacter(byte, (i * 12 * scale), j * 10 * scale, scale);
+        
+				//printf("t: 0x%04X, 0x%02X\n", address + i + j * 40, (unsigned char)memory[address + i + j * 40]);
 			}
 		}
-	}
+	//}
 	//SDL_RenderPresent(guii->renderer);
 }
 
@@ -107,11 +111,13 @@ void drawMem(uint16_t address, char* memory, gui* guii) {
 				
 				char charByte1 = memory[address + memcount];
 				char charByte2 = memory[address + 1 + memcount];
-				uint8_t charBytes = (charByte1 << 8) | charByte2; // Combine the two bytes
-				char printable = charBytes & 0xFF; // Extract the lower byte for the character
+				char charBytes = (charByte1 << 8) | charByte2; // Combine the two bytes
+				//char printable = charBytes & 0xFF; // Extract the lower byte for the character
 				memcount += 1;
+				//	printf("%02X ", (unsigned char)memory[address + i + j * 40]);
+			
+				guii->drawAsciiCharacter(charByte1, i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
 				
-				guii->drawAsciiCharacter(charBytes, i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
 			}
 		}
 	}
