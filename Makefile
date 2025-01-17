@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-I.$(addprefix -I,$(INC_DIRS))
-CXXFLAGS += -g -Wall -Wformat
-CXXFLAGS +=  -L/usr/lib -lSDL2
+CXXFLAGS += -Wall -Wformat
+CXXFLAGS += -L/usr/lib -lSDL2
 LIBS += -L/usr/lib -lSDL2
 OBJDIR=obj/
 SRC_DIRS=hw/ ui/ cores/ include/
@@ -17,9 +17,9 @@ EXE = 3mu
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
     # (-g)  => Enable debug symbols -O0)
-    CXXFLAGS  += -g -O0
+	CXXFLAGS += -g -O0
 else
-     CXXFLAGS += -O3
+	CXXFLAGS += -O3
 endif
 
 $(OBJDIR)%.o:%.cpp
