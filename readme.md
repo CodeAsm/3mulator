@@ -86,8 +86,9 @@ But no particular order and I might migrate parts or incorperate this into other
 * <https://www.w3schools.blog/how-to-print-value-of-pointer-in-c>
 
 ### Generic emulator
-
-captone idea, smart. 15 max
+Capstone idea, smart. 15 max mnemonics.
 * <https://www.youtube.com/watch?v=HPrqOIdNlrQ>
+* <http://www.capstone-engine.org/arch>
+(sadly, z80, 6502 and some more I want, arent yet?)
 
 
