@@ -8,6 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
+            "preLaunchTask": "build with debug",
             "program": "${workspaceFolder}/3mu",
             "args": [],
             "stopAtEntry": false,
