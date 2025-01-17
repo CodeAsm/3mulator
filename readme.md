@@ -4,7 +4,7 @@ My personal small emulation and decompilation project for smaller 8bit like cpu 
 It probably wont work, doesnt provide what you where looking for and programmed the way you like.
 Any suggestions or ideas are welcome.
 
-This is what you would call a system emulator.
+This is what you would call a system emulator. You may look at better dissambly programs like Ghydra, qemu, retroarch or capstone. I made this to learn, maybe you learn something too.
 
 ## How to compile
 
@@ -45,6 +45,14 @@ press 'q' to quit this display/emu for now.
 
 ![Image](images/SAA5050.png)
 
+## Video
+
+For now I imagine the video sources to setup sdl, get imgui at some point and render the mem space the video hardware requires. a gui object might be passed over for this.
+
+multithreading for UI might be preffered. (and an emu menu later). The monitor in the terminal probably should be rerouted so we can also get it inside the window.
+
+For now, no configuration or headless modes excist.
+
 ## Ideas
 
 Some basic ideas I have that I might be able to achieve:
@@ -57,6 +65,7 @@ Some basic ideas I have that I might be able to achieve:
 * NES (ow boy, probably buggy and non working)
 
 But no particular order and I might migrate parts or incorperate this into other projects earlier.
+Most people would probably just need capstone or another emulator. go, go find one of those instead.
 
 ## Resources and helpfull links
 
