@@ -6,6 +6,29 @@ This document is mostly intended for myself.
 
 https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=98898&page=2
 
+## Capstone would be cool
+
+But sadly not all target arch, ISA are supported
+
+## Terminal
+
+First ofcourse we need a somewhat true to real hardware. but then we want fancy looks:
+* <https://stackoverflow.com/questions/63841904/sdl-old-crt-scanlines-without-waste-cpu-time>
+or
+* <>
+
+## Terminal for my terminal?
+
+I dunno, maybe if I need one:
+* <https://github.com/timmoorhouse/imgui-terminal>
+
+### Shaders:
+* <https://www.reddit.com/r/emulation/comments/74hzx3/what_is_the_most_realistic_crt_shader_in_your/>
+* <https://forums.libretro.com/t/a-better-snes-hi-res-blend-shader/1800/7>
+
+the best?
+* <http://emulation.gametechwiki.com/index.php/CRT-Royale>
+
 
 ## classes idea:
 Yes, it is definitely possible to create a system where different CPU objects with their own memory and devices communicate with each other over a serial port or other interfaces. The object-oriented nature of C++ makes it well-suited for this kind of modular design.
