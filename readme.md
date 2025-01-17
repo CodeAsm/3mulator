@@ -4,6 +4,8 @@ My personal small emulation and decompilation project for smaller 8bit like cpu 
 It probably wont work, doesnt provide what you where looking for and programmed the way you like.
 Any suggestions or ideas are welcome.
 
+This is what you would call a system emulator.
+
 ## How to compile
 
 Grab your own gcc compiler or similar and run make. If this doesnt work, RTFM of your distro on how to compile programs.
@@ -82,5 +84,9 @@ But no particular order and I might migrate parts or incorperate this into other
 ### Pointers
 
 * <https://www.w3schools.blog/how-to-print-value-of-pointer-in-c>
+
+### Generic emulator
+
+* <https://www.youtube.com/watch?v=HPrqOIdNlrQ>
 
 
