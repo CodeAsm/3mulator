@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/3mu",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -26,7 +26,10 @@
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "logging": {
+              "engineLogging": true
+            }
         }
 
     ]
