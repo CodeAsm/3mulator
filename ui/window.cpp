@@ -62,13 +62,26 @@ void gui::drawHexCharacter(char value, int x, int y, int scale) {
         {0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b10000, 0b00000, 0b00000}  // F
     };
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
+    
+    //first byte
+    for (int row = 0; row < 9; ++row) {
+        for (int col = 0; col < 5; ++col) {
+            if (font[(value >> 4) & 0x0F][row] & (1 << (4 - col))) {
+                for (int dx = 0; dx < scale; ++dx) {
+                    for (int dy = 0; dy < scale; ++dy) {
+                        drawPoint(x + col * scale + dx, y + row * scale + dy);
+                    }
+                }
+            }
+        }
+    }
+    //second byte
     for (int row = 0; row < 9; ++row) {
         for (int col = 0; col < 5; ++col) {
             if (font[value & 0x0F][row] & (1 << (4 - col))) {
                 for (int dx = 0; dx < scale; ++dx) {
                     for (int dy = 0; dy < scale; ++dy) {
-                        drawPoint(x + col * scale + dx, y + row * scale + dy);
+                        drawPoint(x + 6 * scale + col * scale + dx, y + row * scale + dy);
                     }
                 }
             }
@@ -229,4 +242,71 @@ void gui::drawAsciiCharacter(char value, int x, int y, int scale) {
             }
         }
     }*/
+}
+
+void gui::checkAddressSpace(uint16_t address, char* memory, gui* guii) {
+	int scale = 3;
+	int charWidth = 5 + 1; // 5 pixels wide + 1 pixel space
+	int charHeight = 9 + 1; // 9 pixels high + 1 pixel space
+	int windowWidth = 40 * charWidth * scale;
+	int windowHeight = 24 * charHeight * scale;
+	// Calculate the scale factor
+	int scaleX = windowWidth / (40 * 6); // 40 characters per line, each character is 5 pixels wide + 1 pixel space
+	int scaleY = windowHeight / (24 * 10); // 24 lines, each character is 9 pixels high + 1 pixel space
+	//int scale = std::min(scaleX, scaleY);
+
+	//const uint16_t startAddress = 0x8000; // Example start address
+	//const uint16_t endAddress = 0x87FF;   // Example end address
+
+	//if (address >= startAddress && address <= endAddress) {
+		// Call render function or handle memory changes
+		for (int j = 0; j < 24; ++j) { // 24 lines of characters
+			for (int i = 0; i < 40; ++i) { // 40 characters per line
+				uint16_t byte = memory[address + i + j * 40];
+				//guii->drawHexCharacter(memory[address + i + j * 40], i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+				// //guii->drawHexCharacter(byte, (i * 12 * scale), j * 10 * scale, scale);
+                guii->drawHexCharacter((unsigned char)memory[address + i + j * 40], (i * 12 * scale), j * 10 * scale, scale);
+        
+				//printf("t: 0x%04X, 0x%02X\n", address + i + j * 40, (unsigned char)memory[address + i + j * 40]);
+			}
+		}
+	//}
+	//SDL_RenderPresent(guii->renderer);
+}
+
+
+void gui::drawMem(uint16_t address, char* memory, gui* guii) {
+	int scale = 3;
+	int charWidth = 5 + 1; // 5 pixels wide + 1 pixel space
+	int charHeight = 9 + 1; // 9 pixels high + 1 pixel space
+	int windowWidth = 40 * charWidth * scale;
+	int windowHeight = 24 * charHeight * scale;
+	// Calculate the scale factor
+	int scaleX = windowWidth / (40 * 6); // 40 characters per line, each character is 5 pixels wide + 1 pixel space
+	int scaleY = windowHeight / (24 * 10); // 24 lines, each character is 9 pixels high + 1 pixel space
+	//int scale = std::min(scaleX, scaleY);
+
+	const uint16_t startAddress = 0x8000; // Example start address
+	const uint16_t endAddress = 0x87FF;   // Example end address
+
+
+	int memcount = 0;
+	if (address >= startAddress && address <= endAddress) {
+		// Call render function or handle memory changes
+		for (int j = 0; j < 24; ++j) { // 24 lines of characters
+			for (int i = 0; i < 40; ++i) { // 40 characters per line
+				
+				char charByte1 = memory[address + memcount];
+				char charByte2 = memory[address + 1 + memcount];
+				char charBytes = (charByte1 << 8) | charByte2; // Combine the two bytes
+				//char printable = charBytes & 0xFF; // Extract the lower byte for the character
+				memcount += 1;
+				//	printf("%02X ", (unsigned char)memory[address + i + j * 40]);
+			
+				guii->drawAsciiCharacter(charByte1, i * 6 * scale, j * 10 * scale, scale); // Each character is 5 pixels wide + 1 pixel space, 9 pixels high + 1 pixel space
+				
+			}
+		}
+	}
+	//SDL_RenderPresent(guii->renderer);
 }

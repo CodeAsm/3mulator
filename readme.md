@@ -87,6 +87,7 @@ But no particular order and I might migrate parts or incorperate this into other
 
 ### Generic emulator
 
+captone idea, smart. 15 max
 * <https://www.youtube.com/watch?v=HPrqOIdNlrQ>
 
 
