@@ -29,6 +29,28 @@ I dunno, maybe if I need one:
 the best?
 * <http://emulation.gametechwiki.com/index.php/CRT-Royale>
 
+## MITS Altair/Imsai 8080
+
+Altair, i want 3 variants?:
+MITS 8800B CPU BD REV 0
+ALTAIR 8800B TURNKEY MODULE REV 0
+MITS 16K RAM (?)
+
+The second one:
+MITS 8800B CPU BD REV 0
+PCC TURNKEY MODULE
+PCC S-100 INTERFACE
+CEPC 4-SIO-1
+
+third be configurable, preferably with the switches and lights.
+https://forum.vcfed.org/index.php?threads/what-are-the-correct-boards-for-an-altair-turnkey.51128/
+images:
+http://madrona.ca/e/altair8800b/index.html
+
+### Interface eprom
+"The front-panel uses a 1702 EPROM to control a small sequencing engine for execution of front-panel operations. This EPROM turned out to be faulty. Rather than obtaining and programming another 1702, an adapter for a 2716 was constructed - the 2716 being far more prevalent and easier to program. The data to be programmed into the EPROM is fortunately available in the 8800b manual. "
+(the madrona source)
+I might want this, to allow custom hardware variants to test and such
 
 ## classes idea:
 Yes, it is definitely possible to create a system where different CPU objects with their own memory and devices communicate with each other over a serial port or other interfaces. The object-oriented nature of C++ makes it well-suited for this kind of modular design.
