@@ -30,6 +30,22 @@
             "detail": "Generated task using Makefile with debug enabled"
         },
         {
+            "label": "build z80dis with debug",
+            "type": "shell",
+            "command": "make",
+            "args": [
+            "-f",
+            "Makefile",
+            "z80dis",
+            "DEBUG=1"
+            ],
+            "group": "build",
+            "problemMatcher": [
+            "$gcc"
+            ],
+            "detail": "Generated task using Makefile with debug enabled"
+        },
+        {
             "type": "cppbuild",
             "label": "C/C++: g++ build active file",
             "command": "/usr/bin/g++",

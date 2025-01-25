@@ -46,7 +46,7 @@ all: $(EXE)
 
 # z80dis tool
 z80dis: cores/z80.cpp
-	g++ cores/z80.cpp -o z80dis
+	$(CXX) $(CXXFLAGS) cores/z80.cpp -o z80dis
 
 .PHONY: clean
 clean:
