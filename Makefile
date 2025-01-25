@@ -34,7 +34,6 @@ $(OBJDIR)%.o: hw/%.cpp
 	mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
 
-
 $(OBJDIR)%.o: ui/%.cpp
 	mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -DVERSION=\"$(shell git describe --dirty --always --tags)\"
@@ -42,9 +41,13 @@ $(OBJDIR)%.o: ui/%.cpp
 $(EXE): $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS) 
 
-all:$(EXE)
+all: $(EXE)
 	@echo Build complete for Linux $(shell git describe --dirty --always --tags)
+
+# z80dis tool
+z80dis: cores/z80.cpp
+	g++ cores/z80.cpp -o z80dis
 
 .PHONY: clean
 clean:
-	rm -rf $(EXE) $(OBJS) $(OBJDIR)
+	rm -rf $(EXE) $(OBJS) $(OBJDIR) z80dis

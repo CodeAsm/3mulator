@@ -53,7 +53,39 @@ multithreading for UI might be preffered. (and an emu menu later). The monitor i
 
 For now, no configuration or headless modes excist.
 
+## Z80 Disassembly
+
+The Z80 disassembly feature is currently under development. This will allow you to disassemble Z80 machine code into human-readable assembly instructions. Idea is to use this later on for a proper cpu emulation core.
+Stay tuned for updates on this feature.
+
+```sh
+make z80dis
+```
+and use:
+
+```sh
+Usage: ./z80dis <filename>
+```
+
+you may be able to compile it again, and should become the same as the original:
+
+```sh
+z80asm <filename>
+```
+
+
 ## Ideas
+
+Here are some basic ideas I have that I might be able to achieve:
+
+* Add more CPU types like Z80, 8052, and maybe 8086
+* Load ROMs
+* Implement GPUs for various CPUs (starting simple)
+    * Added SAA5050 prototype, doesn't work yet
+* Decompile various ROMs/pieces of code
+* NES emulation (likely buggy and non-functional initially)
+
+These ideas are not in any particular order, and I might migrate parts or incorporate this into other projects earlier. Most people would probably just need Capstone or another emulator. Go, go find one of those instead.
 
 Some basic ideas I have that I might be able to achieve:
 
