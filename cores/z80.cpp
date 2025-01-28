@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -7,6 +8,80 @@
 #include <unordered_map>
 #include <cstdint>
 
+/*/ Function to decode 0xED prefixed opcodes
+std::string decodeEDOpcode(uint8_t edOpcode) {
+    static const std::unordered_map<uint8_t, std::string> edOpcodeMap = {
+        {0x40, "IN B,(C)"},
+        {0x41, "OUT (C),B"},
+        {0x42, "SBC HL,BC"},
+        {0x43, "LD (nn),BC"},
+        {0x44, "NEG"},
+        {0x45, "RETN"},
+        {0x46, "IM 0"},
+        {0x47, "LD I,A"},
+        {0x48, "IN C,(C)"},
+        {0x49, "OUT (C),C"},
+        {0x4A, "ADC HL,BC"},
+        {0x4B, "LD BC,(nn)"},
+        {0x4D, "RETI"},
+        {0x4F, "LD R,A"},
+        {0x50, "IN D,(C)"},
+        {0x51, "OUT (C),D"},
+        {0x52, "SBC HL,DE"},
+        {0x53, "LD (nn),DE"},
+        {0x56, "IM 1"},
+        {0x57, "LD A,I"},
+        {0x58, "IN E,(C)"},
+        {0x59, "OUT (C),E"},
+        {0x5A, "ADC HL,DE"},
+        {0x5B, "LD DE,(nn)"},
+        {0x5E, "IM 2"},
+        {0x5F, "LD A,R"},
+        {0x60, "IN H,(C)"},
+        {0x61, "OUT (C),H"},
+        {0x62, "SBC HL,HL"},
+        {0x63, "LD (nn),HL"},
+        {0x67, "RRD"},
+        {0x68, "IN L,(C)"},
+        {0x69, "OUT (C),L"},
+        {0x6A, "ADC HL,HL"},
+        {0x6B, "LD HL,(nn)"},
+        {0x6F, "RLD"},
+        {0x70, "IN (C)"},
+        {0x71, "OUT (C),0"},
+        {0x72, "SBC HL,SP"},
+        {0x73, "LD (nn),SP"},
+        {0x78, "IN A,(C)"},
+        {0x79, "OUT (C),A"},
+        {0x7A, "ADC HL,SP"},
+        {0x7B, "LD SP,(nn)"},
+        {0xA0, "LDI"},
+        {0xA1, "CPI"},
+        {0xA2, "INI"},
+        {0xA3, "OUTI"},
+        {0xA8, "LDD"},
+        {0xA9, "CPD"},
+        {0xAA, "IND"},
+        {0xAB, "OUTD"},
+        {0xB0, "LDIR"},
+        {0xB1, "CPIR"},
+        {0xB2, "INIR"},
+        {0xB3, "OTIR"},
+        {0xB8, "LDDR"},
+        {0xB9, "CPDR"},
+        {0xBA, "INDR"},
+        {0xBB, "OTDR"}
+    };
+
+    auto it = edOpcodeMap.find(edOpcode);
+    if (it != edOpcodeMap.end()) {
+        return it->second;
+    } else {
+        return "UNKNOWN";
+    }
+            int8_t offset = static_cast<int8_t>(data[pos + 1]);
+}
+*/
 std::unordered_map<uint8_t, std::string> instructions = {
     {0x00, "NOP"}, {0x01, "LD BC,nn"}, {0x02, "LD (BC),A"}, {0x03, "INC BC"}, {0x04, "INC B"}, {0x05, "DEC B"}, {0x06, "LD B,n"}, {0x07, "RLCA"},
     {0x08, "EX AF,AF'"}, {0x09, "ADD HL,BC"}, {0x0A, "LD A,(BC)"}, {0x0B, "DEC BC"}, {0x0C, "INC C"}, {0x0D, "DEC C"}, {0x0E, "LD C,n"}, {0x0F, "RRCA"},
@@ -43,6 +118,19 @@ std::unordered_map<uint8_t, std::string> instructions = {
     {0xF8, "RET M"}, {0xF9, "LD SP,HL"}, {0xFA, "JP M,nn"}, {0xFB, "EI"}, {0xFC, "CALL M,nn"}, {0xFD, "PREFIX FD"}, {0xFE, "CP n"}, {0xFF, "RST 38H"}
 };
 
+void decodeCBInstruction(uint8_t opcode) {
+    switch (opcode) {
+        case 0x00: std::cout << "RLC B"; break;
+        case 0x01: std::cout << "RLC C"; break;
+        case 0x06: std::cout << "RLC (HL)"; break;
+        case 0x40: std::cout << "BIT 0, B"; break;
+        case 0x7C: std::cout << "BIT 7, H"; break;
+        case 0xC0: std::cout << "SET 0, B"; break;
+        case 0xF6: std::cout << "SET 6, (HL)"; break;
+        // Add more cases for other CB prefixed instructions
+        default: std::cout << "Unknown CB instruction"; break;
+    }
+}
 std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, size_t& size) {
     uint8_t op = data[pos];
     std::ostringstream result;
@@ -67,9 +155,8 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
         else if (op == 0x18 || op == 0x20 || op == 0x28 || op == 0x30 || op == 0x38 || op == 0x10) {
             int8_t offset = static_cast<int8_t>(data[pos + 1]);
             uint16_t target = pos + 2 + offset;
-            result << ins.substr(0, ins.find("e")) << "$" << std::hex << std::setw(4) << std::setfill('0') << target << ins.substr(ins.find("e") + 1);
-            size = 2;
-        // Handle PREFIX instructions
+            result << ins.substr(0, ins.find("e")) << "0x" << std::hex << std::setw(4) << std::setfill('0') << target << ins.substr(ins.find("e") + 1);
+         // Handle PREFIX instructions
         } else if (op == 0xDD || op == 0xFD) {
             size_t prefix_size;
             std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
@@ -92,12 +179,25 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
             size_t prefix_size;
             std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
             result << "CB " << prefix_ins;
-            size = 1 + prefix_size;
+            size = 2;
         } else if (op == 0xED) {
+            /*
+            uint8_t edOpcode = data[pos + 1];
+            std::string edInstruction = decodeEDOpcode(edOpcode);
+            result << "ED " << edInstruction << " (" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(data[pos + 1]) << ")";
+            size = 2;
+            */
+
+            uint8_t edOpcode = data[pos + 1];
+            if (edOpcode == 0xB0) {
+            result << "LDIR";
+            size = 2;
+            } else {
             size_t prefix_size;
             std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
-            result << "ED " << prefix_ins;
+            result << prefix_ins;
             size = 1 + prefix_size;
+            }
         } else {
             result << ins;
         }
@@ -108,7 +208,6 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
 
     return result.str();
 }
-
 
 std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0) {
     size_t pos = 0;
@@ -151,9 +250,14 @@ std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0)
         result << buffer;
 
         // Add the comment with the original address and description
-        snprintf(buffer, sizeof(buffer), "; %04x ", static_cast<int>(org + pos));
+        snprintf(buffer, sizeof(buffer), "; %04x :", static_cast<int>(org + pos));
         result << buffer;
 
+
+        for (size_t x = 0; x < size; ++x) {
+            snprintf(buffer, sizeof(buffer), "%02X ", data[pos + x]);
+            result << buffer;
+        }
         // Add a description based on the instruction
       /*  if (ins.find("LD A,") != std::string::npos) {
             result << "loads " << std::stoi(ins.substr(6), nullptr, 16);
@@ -162,7 +266,9 @@ std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0)
         } else if (ins.find("XOR A") != std::string::npos) {
             result << "zero A";
         } else if (ins.find("OUT (") != std::string::npos) {
-            result << "show A on " << ins.substr(5, 1);
+
+
+int main(int argc, char* argv[]) {
         } else if (ins.find("LD A,") != std::string::npos) {
             result << "loads " << std::stoi(ins.substr(6), nullptr, 16);
         }*/
