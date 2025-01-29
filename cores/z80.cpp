@@ -7,8 +7,9 @@
 #include <sstream>
 #include <unordered_map>
 #include <cstdint>
+#include <algorithm>
 
-/*/ Function to decode 0xED prefixed opcodes
+// Function to decode 0xED prefixed opcodes
 std::string decodeEDOpcode(uint8_t edOpcode) {
     static const std::unordered_map<uint8_t, std::string> edOpcodeMap = {
         {0x40, "IN B,(C)"},
@@ -79,9 +80,47 @@ std::string decodeEDOpcode(uint8_t edOpcode) {
     } else {
         return "UNKNOWN";
     }
-            int8_t offset = static_cast<int8_t>(data[pos + 1]);
 }
-*/
+
+
+// Function to check if a byte is a printable ASCII character
+bool is_printable_ascii(uint8_t byte) {
+    return (0x20 <= byte && byte <= 0x7E) || byte == 0x0A || byte == 0x0D;
+}
+
+// Function to detect strings in the ROM dump
+std::vector<std::pair<size_t, std::vector<uint8_t>>> detect_strings(const std::vector<uint8_t>& rom_dump, size_t min_length = 3) {
+    std::vector<std::pair<size_t, std::vector<uint8_t>>> strings;
+    std::vector<uint8_t> current_string;
+    size_t start_index = 0;
+
+    for (size_t i = 0; i < rom_dump.size(); ++i) {
+        uint8_t byte = rom_dump[i];
+        if (is_printable_ascii(byte)) {
+            if (current_string.empty()) {
+                start_index = i;
+            }
+            current_string.push_back(byte);
+        } else if (byte == 0x00) {
+            if (current_string.size() >= min_length) {
+                current_string.push_back(byte);
+                strings.push_back({start_index, current_string});
+            }
+            current_string.clear();
+        } else {
+            if (current_string.size() >= min_length) {
+                strings.push_back({start_index, current_string});
+            }
+            current_string.clear();
+        }
+    }
+    if (current_string.size() >= min_length) {
+        current_string.push_back(0x00);
+        strings.push_back({start_index, current_string});
+    }
+    return strings;
+}
+
 std::unordered_map<uint8_t, std::string> instructions = {
     {0x00, "NOP"}, {0x01, "LD BC,nn"}, {0x02, "LD (BC),A"}, {0x03, "INC BC"}, {0x04, "INC B"}, {0x05, "DEC B"}, {0x06, "LD B,n"}, {0x07, "RLCA"},
     {0x08, "EX AF,AF'"}, {0x09, "ADD HL,BC"}, {0x0A, "LD A,(BC)"}, {0x0B, "DEC BC"}, {0x0C, "INC C"}, {0x0D, "DEC C"}, {0x0E, "LD C,n"}, {0x0F, "RRCA"},
@@ -118,18 +157,42 @@ std::unordered_map<uint8_t, std::string> instructions = {
     {0xF8, "RET M"}, {0xF9, "LD SP,HL"}, {0xFA, "JP M,nn"}, {0xFB, "EI"}, {0xFC, "CALL M,nn"}, {0xFD, "PREFIX FD"}, {0xFE, "CP n"}, {0xFF, "RST 38H"}
 };
 
-void decodeCBInstruction(uint8_t opcode) {
+std::string decodeCBInstruction(const std::vector<uint8_t>& data, size_t pos, size_t& size) {
+    std::ostringstream result;
+    uint8_t opcode = data[pos];
+    size = 2;
     switch (opcode) {
-        case 0x00: std::cout << "RLC B"; break;
-        case 0x01: std::cout << "RLC C"; break;
-        case 0x06: std::cout << "RLC (HL)"; break;
-        case 0x40: std::cout << "BIT 0, B"; break;
-        case 0x7C: std::cout << "BIT 7, H"; break;
-        case 0xC0: std::cout << "SET 0, B"; break;
-        case 0xF6: std::cout << "SET 6, (HL)"; break;
-        // Add more cases for other CB prefixed instructions
-        default: std::cout << "Unknown CB instruction"; break;
+        case 0x00:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": RLC B\n";
+            break;
+        case 0x01:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": RLC C\n";
+            break;
+        case 0x06:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": RLC (HL)\n";
+            break;
+        case 0x07:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": RLC A\n";
+            break;
+        case 0x40:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": BIT 0, B\n";
+            break;
+        case 0x7C:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": BIT 7, H\n";
+            break;
+        case 0xC0:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": SET 0, B\n";
+            break;
+        case 0xF6:
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": SET 6, (HL)\n";
+            break;
+        default:
+            // Add more cases for other CB prefixed instructions
+            result << std::hex << std::setw(4) << std::setfill('0') << pos << ": DB 0xCB, 0x" << std::hex << std::setw(2) << std::setfill('0') << "\n";
+            break;
     }
+    
+    return result.str();
 }
 std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, size_t& size) {
     uint8_t op = data[pos];
@@ -140,13 +203,13 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
         size = 1;
 
         // Instructions with 16-bit arguments
-        if (op == 0x01 || op == 0x11 || op == 0x21 || op == 0x31 || op == 0xC2 || op == 0xCA || op == 0xD2 || op == 0xDA || op == 0xE2 || op == 0xEA || op == 0xF2 || op == 0xFA || op == 0xC3 || op == 0xCD) {
+        if (op == 0x01 || op == 0x11 || op == 0x21 || op == 0x2A || op == 0x31 || op == 0x32 || op == 0x3A || op == 0xC2 || op == 0xCA || op == 0xCC || op == 0xD2 || op == 0xD4 || op == 0xDA || op == 0xE2 || op == 0xEA || op == 0xF2 || op == 0xF4 || op == 0xFA || op == 0xC3 || op == 0xCD) {
             uint16_t nn = data[pos + 1] + (data[pos + 2] << 8);
             result << ins.substr(0, ins.find("nn")) << "0x" << std::hex << std::setw(4) << std::setfill('0') << nn << ins.substr(ins.find("nn") + 2);
             size = 3;
         }
         // Instructions with 8-bit arguments
-        else if (op == 0x06 || op == 0x0E || op == 0x16 || op == 0x1E || op == 0x26 || op == 0x2E || op == 0x36 || op == 0x3E || op == 0xC6 || op == 0xCE || op == 0xD3 || op == 0xD6 || op == 0xDE || op == 0xE6 || op == 0xEE || op == 0xF6 || op == 0xFE) {
+        else if (op == 0x06 || op == 0x0E || op == 0x16 || op == 0x1E || op == 0x26 || op == 0x2E || op == 0x36 || op == 0x3E || op == 0xC6 || op == 0xCE || op == 0xD3 || op == 0xD6 || op == 0xDB || op == 0xDE || op == 0xE6 || op == 0xEE || op == 0xF6 || op == 0xFE) {
             uint8_t n = data[pos + 1];
             result << ins.substr(0, ins.find("n")) << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(n) << ins.substr(ins.find("n") + 1);
             size = 2;
@@ -156,6 +219,7 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
             int8_t offset = static_cast<int8_t>(data[pos + 1]);
             uint16_t target = pos + 2 + offset;
             result << ins.substr(0, ins.find("e")) << "0x" << std::hex << std::setw(4) << std::setfill('0') << target << ins.substr(ins.find("e") + 1);
+             size = 2;
          // Handle PREFIX instructions
         } else if (op == 0xDD || op == 0xFD) {
             size_t prefix_size;
@@ -176,28 +240,32 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
             result << prefix_ins;
             size = 1 + prefix_size;
         } else if (op == 0xCB) {
-            size_t prefix_size;
-            std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
-            result << "CB " << prefix_ins;
-            size = 2;
+             result << decodeCBInstruction(data, pos + 1, size);
         } else if (op == 0xED) {
-            /*
+            
             uint8_t edOpcode = data[pos + 1];
             std::string edInstruction = decodeEDOpcode(edOpcode);
-            result << "ED " << edInstruction << " (" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(data[pos + 1]) << ")";
-            size = 2;
-            */
+            result << edInstruction;
+            size = 2; // Default size for ED prefixed instructions
+    
 
+            // Check if the instruction has additional operands
+            if (edOpcode == 0x43 || edOpcode == 0x4B || edOpcode == 0x53 || edOpcode == 0x5B || edOpcode == 0x63 || edOpcode == 0x6B || edOpcode == 0x73 || edOpcode == 0x7B) {
+                uint16_t nn = data[pos + 2] + (data[pos + 3] << 8);
+                result << " 0x" << std::hex << std::setw(4) << std::setfill('0') << nn;
+                size = 4;
+            }            
+            /*
             uint8_t edOpcode = data[pos + 1];
             if (edOpcode == 0xB0) {
-            result << "LDIR";
-            size = 2;
+                result << "LDIR";
+                size = 2;   
             } else {
-            size_t prefix_size;
-            std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
-            result << prefix_ins;
-            size = 1 + prefix_size;
-            }
+                size_t prefix_size;
+                std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
+                result << prefix_ins;
+                size = 1 + prefix_size;
+            } */
         } else {
             result << ins;
         }
@@ -214,8 +282,50 @@ std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0)
     size_t end = data.size();
     std::ostringstream result;
 
+   // auto strings = detect_strings(data);
+    auto strings = detect_strings(data);
+
+
     while (pos < end) {
         size_t size;
+
+          
+        // Check if the current position is the start of a string
+        auto string_at_pos = std::find_if(strings.begin(), strings.end(), [pos](const std::pair<size_t, std::vector<uint8_t>>& s) {
+            return s.first == pos;
+        });
+
+        if (string_at_pos != strings.end()) {
+            size_t start_index = string_at_pos->first;
+            const std::vector<uint8_t>& string_bytes = string_at_pos->second;
+            std::string string_label = "string_" + std::to_string(start_index + org);
+            std::string string_content;
+            bool is_null_terminated = false;
+
+            for (size_t i = 0; i < string_bytes.size(); ++i) {
+                uint8_t byte = string_bytes[i];
+                if (byte == 0x0A) {
+                    string_content += "\\n";
+                } else if (byte == 0x0D) {
+                    string_content += "\\r";
+                } else if (byte == 0x00) {
+                    is_null_terminated = true;
+                    break;
+                } else {
+                    string_content += static_cast<char>(byte);
+                }
+            }
+
+            result << string_label << ": defm \"" << string_content << "\"";
+            if (is_null_terminated) {
+                result << ", 0";
+            }
+            result << "\n";
+
+            pos += string_bytes.size();
+            continue;
+        }
+
         std::string ins = decode_instruction(data, pos, size);
 
         // Print the instruction
