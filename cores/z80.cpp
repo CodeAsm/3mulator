@@ -255,17 +255,6 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
                 result << " 0x" << std::hex << std::setw(4) << std::setfill('0') << nn;
                 size = 4;
             }            
-            /*
-            uint8_t edOpcode = data[pos + 1];
-            if (edOpcode == 0xB0) {
-                result << "LDIR";
-                size = 2;   
-            } else {
-                size_t prefix_size;
-                std::string prefix_ins = decode_instruction(data, pos + 1, prefix_size);
-                result << prefix_ins;
-                size = 1 + prefix_size;
-            } */
         } else {
             result << ins;
         }
@@ -331,29 +320,6 @@ std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0)
         // Print the instruction
         result << ins;
 
-        // Print the arguments if any
-        /*if (size > 1) {
-            result << " ";
-            for (size_t x = 1; x < size; ++x) {
-                //result << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(data[pos + x]);
-                if (x < size - 1) {
-                    result << " ";
-                }
-            }
-        }
-        */
-        // Print the arguments if any
-        /*
-        if (size > 1) {
-            result << " ";
-            for (size_t x = 1; x < size; ++x) {
-                result << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(data[pos + x]);
-                if (x < size - 1) {
-                    result << " ";
-                }
-            }
-        }*/
-
         // Align the comment
         char buffer[60];
         snprintf(buffer, sizeof(buffer), "%-*s", 20 - static_cast<int>(ins.length()), " ");
@@ -368,21 +334,7 @@ std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0)
             snprintf(buffer, sizeof(buffer), "%02X ", data[pos + x]);
             result << buffer;
         }
-        // Add a description based on the instruction
-      /*  if (ins.find("LD A,") != std::string::npos) {
-            result << "loads " << std::stoi(ins.substr(6), nullptr, 16);
-        } else if (ins.find("OUT (") != std::string::npos) {
-            result << "A onto io " << ins.substr(5, 1);
-        } else if (ins.find("XOR A") != std::string::npos) {
-            result << "zero A";
-        } else if (ins.find("OUT (") != std::string::npos) {
-
-
-int main(int argc, char* argv[]) {
-        } else if (ins.find("LD A,") != std::string::npos) {
-            result << "loads " << std::stoi(ins.substr(6), nullptr, 16);
-        }*/
-
+       
         result << "\n";
         pos += size;
     }
