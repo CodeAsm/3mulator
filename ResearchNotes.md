@@ -57,6 +57,12 @@ http://madrona.ca/e/altair8800b/index.html
 (the madrona source)
 I might want this, to allow custom hardware variants to test and such
 
+## cp/m
+
+https://bryceautomation.com/index.php/2022/12/10/compiling-cp-m-for-z80/
+https://bryceautomation.com/index.php/2023/05/16/z80asm-on-imsai-8080/
+http://cpuville.com/Kits/Bus-display-kit.html
+
 ## classes idea:
 Yes, it is definitely possible to create a system where different CPU objects with their own memory and devices communicate with each other over a serial port or other interfaces. The object-oriented nature of C++ makes it well-suited for this kind of modular design.
 
