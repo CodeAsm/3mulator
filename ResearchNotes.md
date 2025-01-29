@@ -10,6 +10,11 @@ https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=98898&page=2
 
 But sadly not all target arch, ISA are supported
 
+### Z80 based on a python project and copilot
+
+For z80 ive had multiple attempts, for now, i started to dissasble romcode and make it write sourcecode that should compile.
+I hope this helps make a "accurate" emulator later.
+
 ## Terminal
 
 First ofcourse we need a somewhat true to real hardware. but then we want fancy looks:

@@ -125,3 +125,72 @@ void write_text() {
 
 These mappings and examples illustrate how text modes were implemented using specific video memory regions, enabling the CPU to directly control the display. Let me know if you'd like help experimenting with this in an emulator!
 
+
+## Z80 test
+
+source:
+00000000  f3 00 00 00 00 00 c5 e5  dd e5 e1 29 09 44 4d c5  |...........).DM.|
+00000010  dd e1 e1 c1 dd e9 58 06  6c 06 80 06 9b 06 a8 06  |......X.l.......|
+00000020  2a 07 30 07 89 06 de 06  3e 80 d3 03 3e 0c d3 00  |*.0.....>...>...|
+00000030  af d3 01 3e 03 d3 03 21  dd 00 cd 30 07 fe aa 28  |...>...!...0...(|
+00000040  15 21 7d 01 cd 30 07 21  00 80 54 5d 13 01 ff 7f  |.!}..0.!..T]....|
+
+recompiled
+00000000  f3 00 00 00 00 00 c5 e5  dd e5 e1 29 09 44 4d c5  |...........).DM.|
+00000010  dd e1 e1 c1 dd e9 58 06  6c 06 80 06 9b 06 a8 06  |......X.l.......|
+00000020  2a 07 30 e3 89 06 de 06  3e 80 d3 03 3e 0c d3 00  |*.0.....>...>...|
+00000030  af d3 01 3e 03 d3 03 21  dd 00 cd 30 07 fe aa 28  |...>...!...0...(|
+00000040  d4 21 7d 01 cd 30 07 21  00 80 54 5d              |.!}..0.!..T]|
+
+                 ORG #0
+link_1:          EQU #2B
+link_2:          EQU #56
+begin:
+                 DI              ; #0    / 0     ;      ; #F3
+                 NOP             ; #1    / 1     ;      ; #00
+                 NOP             ; #2    / 2     ;      ; #00
+                 NOP             ; #3    / 3     ;      ; #00
+                 NOP             ; #4    / 4     ;      ; #00
+                 NOP             ; #5    / 5     ;      ; #00
+                 PUSH BC         ; #6    / 6     ;      ; #C5
+                 PUSH HL         ; #7    / 7     ;      ; #E5
+                 PUSH IX         ; #8    / 8     ;      ; #DD,#E5
+                 POP HL          ; #A    / 10    ;      ; #E1
+                 ADD HL,HL       ; #B    / 11    ; )    ; #29
+                 ADD HL,BC       ; #C    / 12    ;      ; #09
+                 LD B,H          ; #D    / 13    ; D    ; #44
+                 LD C,L          ; #E    / 14    ; M    ; #4D
+                 PUSH BC         ; #F    / 15    ;      ; #C5
+                 POP IX          ; #10   / 16    ;      ; #DD,#E1
+                 POP HL          ; #12   / 18    ;      ; #E1
+                 POP BC          ; #13   / 19    ;      ; #C1
+                 JP IX           ; #14   / 20    ;      ; #DD,#E9
+                 LD E,B          ; #16   / 22    ; X    ; #58
+                 LD B,#6C        ; #17   / 23    ;  l   ; #06,#6C
+                 LD B,#80        ; #19   / 25    ;      ; #06,#80
+                 LD B,#9B        ; #1B   / 27    ;      ; #06,#9B
+                 LD B,#A8        ; #1D   / 29    ;      ; #06,#A8
+                 LD B,#2A        ; #1F   / 31    ;  *   ; #06,#2A
+                 RLCA            ; #21   / 33    ;      ; #07
+                 JR NC,link_1    ; #22   / 34    ; 0    ; #30,#07
+                 ADC C           ; #24   / 36    ;      ; #89
+                 LD B,#DE        ; #25   / 37    ;      ; #06,#DE
+                 LD B,#3E        ; #27   / 39    ;  >   ; #06,#3E
+                 ADD B           ; #29   / 41    ;      ; #80
+                 OUT (#03),A     ; #2A   / 42    ;      ; #D3,#03
+                 LD A,#0C        ; #2C   / 44    ; >    ; #3E,#0C
+                 OUT (#00),A     ; #2E   / 46    ;      ; #D3,#00
+                 XOR A           ; #30   / 48    ;      ; #AF
+                 OUT (#01),A     ; #31   / 49    ;      ; #D3,#01
+                 LD A,#03        ; #33   / 51    ; >    ; #3E,#03
+                 OUT (#03),A     ; #35   / 53    ;      ; #D3,#03
+                 LD HL,#00DD     ; #37   / 55    ; !    ; #21,#DD,#00
+                 CALL #0730      ; #3A   / 58    ;  0   ; #CD,#30,#07
+                 CP #AA          ; #3D   / 61    ;      ; #FE,#AA
+                 JR Z,link_2     ; #3F   / 63    ; (    ; #28,#15
+                 LD HL,#017D     ; #41   / 65    ; !}   ; #21,#7D,#01
+                 CALL #0730      ; #44   / 68    ;  0   ; #CD,#30,#07
+                 LD HL,#8000     ; #47   / 71    ; !    ; #21,#00,#80
+                 LD D,H          ; #4A   / 74    ; T    ; #54
+                 LD E,L          ; #4B   / 75    ; ]    ; #5D
+end:
