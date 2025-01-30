@@ -9,7 +9,12 @@
 #include <cstdint>
 #include <algorithm>
 
-// Function to decode 0xED prefixed opcodes
+/**
+ * @brief Decodes a Z80 opcode from the provided data vector.
+ * 
+ * @param edOpcode   
+ * @return * std::string  
+ */
 std::string decodeEDOpcode(uint8_t edOpcode) {
     static const std::unordered_map<uint8_t, std::string> edOpcodeMap = {
         {0x40, "IN B,(C)"},
@@ -82,13 +87,23 @@ std::string decodeEDOpcode(uint8_t edOpcode) {
     }
 }
 
-
-// Function to check if a byte is a printable ASCII character
+/**
+ * @brief Function to check if a byte is a printable ASCII character
+ *  
+ * @param byte
+ * @return bool 
+ */
 bool is_printable_ascii(uint8_t byte) {
     return (0x20 <= byte && byte <= 0x7E) || byte == 0x0A || byte == 0x0D;
 }
 
-// Function to detect strings in the ROM dump
+/**
+ * @brief Detects strings in a ROM dump.
+ * 
+ * @param rom_dump 
+ * @param min_length 
+ * @return * std::vector<std::pair<size_t, std::vector<uint8_t>>> 
+ */
 std::vector<std::pair<size_t, std::vector<uint8_t>>> detect_strings(const std::vector<uint8_t>& rom_dump, size_t min_length = 3) {
     std::vector<std::pair<size_t, std::vector<uint8_t>>> strings;
     std::vector<uint8_t> current_string;
@@ -121,6 +136,10 @@ std::vector<std::pair<size_t, std::vector<uint8_t>>> detect_strings(const std::v
     return strings;
 }
 
+/**
+ * @brief An unordered map containing the Z80 instructions and their corresponding opcodes.
+ * 
+ */
 std::unordered_map<uint8_t, std::string> instructions = {
     {0x00, "NOP"}, {0x01, "LD BC,nn"}, {0x02, "LD (BC),A"}, {0x03, "INC BC"}, {0x04, "INC B"}, {0x05, "DEC B"}, {0x06, "LD B,n"}, {0x07, "RLCA"},
     {0x08, "EX AF,AF'"}, {0x09, "ADD HL,BC"}, {0x0A, "LD A,(BC)"}, {0x0B, "DEC BC"}, {0x0C, "INC C"}, {0x0D, "DEC C"}, {0x0E, "LD C,n"}, {0x0F, "RRCA"},
@@ -157,6 +176,26 @@ std::unordered_map<uint8_t, std::string> instructions = {
     {0xF8, "RET M"}, {0xF9, "LD SP,HL"}, {0xFA, "JP M,nn"}, {0xFB, "EI"}, {0xFC, "CALL M,nn"}, {0xFD, "PREFIX FD"}, {0xFE, "CP n"}, {0xFF, "RST 38H"}
 };
 
+/**
+ * Decodes a CB-prefixed Z80 instruction from the provided data vector.
+ *
+ * @param data The vector containing the instruction bytes.
+ * @param pos The position in the vector where the CB prefix is located.
+ * @param size Reference to a size_t variable where the size of the decoded instruction will be stored.
+ * @return A string representing the decoded instruction.
+ *
+ * The function handles various CB-prefixed instructions, including:
+ * - Rotate and Shift Instructions (e.g., RLC, RL)
+ * - BIT Instructions: These instructions test a specific bit in a register or memory location.
+ *   - BIT b, r: Tests bit b in register r and sets or resets the zero flag accordingly.
+ *     - Example: BIT 0, B tests bit 0 of register B.
+ *     - Example: BIT 7, (HL) tests bit 7 of the memory location pointed to by HL.
+ * - RES Instructions: These instructions reset a specific bit in a register or memory location.
+ * - SET Instructions: These instructions set a specific bit in a register or memory location.
+ *
+ * If the opcode does not match any known instruction, the function returns a string representing
+ * the unknown opcode in hexadecimal format.
+ */
 std::string decodeCBInstruction(const std::vector<uint8_t>& data, size_t pos, size_t& size) {
     std::ostringstream result; // Create a string stream to store the decoded instruction
     uint8_t opcode = data[pos]; // Correctly get the second byte after CB prefix
@@ -423,6 +462,27 @@ std::string decodeCBInstruction(const std::vector<uint8_t>& data, size_t pos, si
 
     return result.str();
 }
+
+/**
+ * Decodes a Z80 instruction from the given data vector starting at the specified position.
+ *
+ * @param data The vector of bytes representing the machine code.
+ * @param pos The position in the data vector where the instruction starts.
+ * @param size A reference to a size_t variable where the size of the decoded instruction will be stored.
+ * @return A string representing the decoded instruction in human-readable form.
+ *
+ * The function first retrieves the opcode at the specified position. It then looks up the corresponding
+ * instruction mnemonic from the instructions map. Depending on the opcode, it handles different types of
+ * instructions:
+ * - Instructions with 16-bit arguments: These instructions have a 16-bit immediate value (nn) following the opcode.
+ * - Instructions with 8-bit arguments: These instructions have an 8-bit immediate value (n) following the opcode.
+ * - Relative jumps with 8-bit signed offset: These instructions have an 8-bit signed offset (e) following the opcode.
+ * - PREFIX instructions: These instructions are prefixed with 0xDD, 0xFD, 0xCB, or 0xED and require special handling.
+ *   - 0xDD and 0xFD prefixes modify subsequent instructions to use IX and IY registers instead of HL.
+ *   - 0xCB prefix indicates a bit manipulation instruction, which is decoded by the decodeCBInstruction function.
+ *   - 0xED prefix indicates an extended instruction, which is decoded by the decodeEDOpcode function.
+ * If the opcode is not recognized, the function returns "NOP   ; unknown instruction".
+ */
 std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, size_t& size) {
     uint8_t op = data[pos];
     std::ostringstream result;
@@ -495,6 +555,10 @@ std::string decode_instruction(const std::vector<uint8_t>& data, size_t pos, siz
     return result.str();
 }
 
+// Convert the data to Z80 assembler, 
+// starting at the specified origin address.
+// The function returns a string containing the Z80 assembler code.
+// The function uses the detect_strings function to identify and label strings in the data.
 std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0) {
     size_t pos = 0;
     size_t end = data.size();
@@ -571,6 +635,13 @@ std::string convertToAssembler(const std::vector<uint8_t>& data, size_t org = 0)
     return result.str();
 }
 
+/**
+ * @brief Main function that reads a binary file and converts it to Z80 assembler code.
+ * 
+ * @param argc
+ * @param argv 
+ * @return int 
+ */
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <filename>\n";
