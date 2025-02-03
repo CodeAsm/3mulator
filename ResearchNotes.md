@@ -15,6 +15,19 @@ But sadly not all target arch, ISA are supported
 For z80 ive had multiple attempts, for now, i started to dissasble romcode and make it write sourcecode that should compile.
 I hope this helps make a "accurate" emulator later.
 
+### Code checks
+
+Ive compared the first bunch of code against a monitor program i wrote, but more checks needed. maybe a emulation testset or stress test set might be needed. will look into this.
+
+Ideas are to see what code is common:
+- https://github.com/fiskabollen/z80Monitor
+- https://github.com/p2000t
+- https://github.com/skx/z80-examples
+    - https://github.com/skx/z80-examples/blob/master/simple-monitor.z80
+    - https://github.com/skx/lighthouse-of-doom/blob/master/Makefile
+- https://github.com/djtersteegc/z80-cmos-nmos-tester
+    - https://www.tindie.com/products/tersteeg/z80-cmos-nmos-tester-pcb/
+
 ## Terminal
 
 First ofcourse we need a somewhat true to real hardware. but then we want fancy looks:
